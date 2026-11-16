@@ -1,6 +1,8 @@
 # AI Agents and Applications
 
-Chapter notebooks and examples. Python dependencies are managed with [uv](https://docs.astral.sh/uv/) as a **workspace**: every `ch*` folder is a member, and all chapters share one `uv.lock` and one `.venv` at the repo root.
+Chapter notebooks and examples | [Solutions](https://github.com/roberto-inf/building-llm-applications).
+
+Python dependencies are managed with [uv](https://docs.astral.sh/uv/) as a **workspace**: every `ch*` folder is a member, and all chapters share one `uv.lock` and one `.venv` at the repo root.
 
 ## Setup
 
