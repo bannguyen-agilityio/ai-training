@@ -20,7 +20,7 @@ This creates `.venv/` and installs the dependencies of every chapter.
 
 **Browser:**
 ```bash
-uv run --package ch01 jupyter notebook ch01/01-langchain_examples.ipynb
+uv run jupyter notebook ch01/01-langchain_examples.ipynb
 ```
 
 ## Adding a new chapter

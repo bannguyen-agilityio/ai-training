@@ -5,6 +5,4 @@ requires-python = ">=3.12"
 dependencies = [
     "langchain==1.0.3",
     "langchain-openai==1.0.1",
-    "notebook==7.4.5",
-    "python-dotenv>=1.2.4",
 ]

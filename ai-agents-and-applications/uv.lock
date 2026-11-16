@@ -17,6 +17,16 @@ members = [
 name = "ai-agents-and-applications"
 version = "0.1.0"
 source = { virtual = "." }
+dependencies = [
+    { name = "notebook" },
+    { name = "python-dotenv" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "notebook", specifier = "==7.4.5" },
+    { name = "python-dotenv", specifier = ">=1.2.4" },
+]
 
 [[package]]
 name = "annotated-types"
@@ -284,16 +294,12 @@ source = { virtual = "ch01" }
 dependencies = [
     { name = "langchain" },
     { name = "langchain-openai" },
-    { name = "notebook" },
-    { name = "python-dotenv" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "langchain", specifier = "==1.0.3" },
     { name = "langchain-openai", specifier = "==1.0.1" },
-    { name = "notebook", specifier = "==7.4.5" },
-    { name = "python-dotenv", specifier = ">=1.2.4" },
 ]
 
 [[package]]
