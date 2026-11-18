@@ -1,0 +1,9 @@
+[project]
+name = "lang-fuse-setup"
+version = "0.1.0"
+requires-python = ">=3.14"
+dependencies = [
+    "langfuse>=5.2.0",
+    "openai>=3.54.0",
+    "python-dotenv>=1.2.4",
+]
