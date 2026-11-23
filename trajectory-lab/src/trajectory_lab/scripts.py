@@ -1,6 +1,6 @@
-"""Hand-written trajectories used as test fixtures (no LLM, no network).
+"""Hand-written trajectories: the mock planner for `traj-agent --mock` and the test fixtures.
 
-They are the reference runs behind the expected results in the docs.
+No LLM, no network. They are the reference runs behind the expected results in the docs.
 """
 
 from __future__ import annotations

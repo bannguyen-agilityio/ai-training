@@ -29,7 +29,7 @@ Skip all scores with `--no-scores`.
 
 ## Reference results
 
-From the hand-written trajectories in `tests/scripts.py`, which the tests assert. Real-LLM runs vary.
+From the hand-written trajectories in `src/trajectory_lab/scripts.py`, which the tests assert. Real-LLM runs vary.
 
 ```
 scenario     PRIMARY             tool accuracy  no-info  wasted
