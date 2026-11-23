@@ -9,7 +9,6 @@ import operator
 import os
 import time
 from collections.abc import Callable
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
@@ -17,6 +16,7 @@ from dotenv import load_dotenv
 from langfuse import get_client, observe, propagate_attributes
 
 from .llm import chat
+from .scripts import SCRIPTS, Move
 
 ROOT = Path(__file__).resolve().parents[2]  # the trajectory-lab/ folder, wherever you run from
 RUNS_FILE = ROOT / "runs.jsonl"
@@ -137,13 +137,6 @@ TOOL_DESCRIPTIONS = {
 
 
 # --------------------------------------------------------------------------- scenarios
-@dataclass(frozen=True)
-class Move:
-    thought: str
-    action: str
-    args: dict[str, Any]
-
-
 SCENARIOS: dict[str, str] = {
     "happy": "Where is order A-1001 and when will it arrive?",
     "deviation": "Order A-1002 was delivered 40 days ago. Can I get a cash refund?",
@@ -205,6 +198,21 @@ def llm_planner(tools: str, scenario: str) -> Callable[[int, str, list[dict[str,
     return plan
 
 
+def mock_planner(scenario: str) -> Callable[[int, str, list[dict[str, Any]]], Move]:
+    """Replay the hand-written script for a scenario: deterministic, no LLM, same trace shape."""
+    moves = SCRIPTS[scenario][1]
+
+    def plan(n: int, task: str, history: list[dict[str, Any]]) -> Move:
+        move = moves[n - 1] if n <= len(moves) else Move("script ended", FINAL, {"answer": ""})
+        with get_client().start_as_current_observation(
+            name="plan", as_type="generation", input=f"Task: {task}", model="mock-planner"
+        ) as gen:
+            gen.update(output=json.dumps({"thought": move.thought, "action": move.action}))
+        return move
+
+    return plan
+
+
 # --------------------------------------------------------------------------- run loop
 def _trace_url(trace_id: str) -> str | None:
     try:
@@ -213,11 +221,13 @@ def _trace_url(trace_id: str) -> str | None:
         return None
 
 
-def run_agent(scenario: str, confusing: bool, max_steps: int, session: str) -> dict[str, Any]:
+def run_agent(
+    scenario: str, confusing: bool, max_steps: int, session: str, mock: bool = False
+) -> dict[str, Any]:
     lf = get_client()
     task = SCENARIOS[scenario]
     tools = "confusing" if confusing else "clear"
-    plan_fn = llm_planner(tools, scenario)
+    plan_fn = mock_planner(scenario) if mock else llm_planner(tools, scenario)
     history: list[dict[str, Any]] = []
     answer: str | None = None
 
@@ -226,7 +236,7 @@ def run_agent(scenario: str, confusing: bool, max_steps: int, session: str) -> d
             session_id=session,
             user_id="learner",
             trace_name=f"support-{scenario}",
-            metadata={"scenario": scenario, "tools": tools},
+            metadata={"scenario": scenario, "tools": tools, "planner": "mock" if mock else "llm"},
         ),
         lf.start_as_current_observation(name="support-agent", as_type="agent", input=task) as root,
     ):
@@ -293,19 +303,22 @@ def main() -> None:
     ap = argparse.ArgumentParser(description="Run the support agent and emit Langfuse traces.")
     ap.add_argument("--scenario", choices=[*SCENARIOS, "all"], default="all")
     ap.add_argument("--confusing-tools", action="store_true")
+    ap.add_argument(
+        "--mock", action="store_true", help="replay scripted trajectories: no LLM, no .env keys"
+    )
     ap.add_argument("--max-steps", type=int, default=8)
     ap.add_argument("--answer", action="store_true", help="print the answer key for each run")
     ap.add_argument("--session", default=f"traj-{time.strftime('%Y%m%d-%H%M%S')}")
     a = ap.parse_args()
 
-    if not all(os.environ.get(k) for k in ("OPENAI_BASE_URL", "OPENAI_API_KEY", "AGENT_MODEL")):
+    if not a.mock and not all(os.environ.get(k) for k in ("OPENAI_BASE_URL", "OPENAI_API_KEY", "AGENT_MODEL")):
         raise SystemExit(
             "Set OPENAI_BASE_URL, OPENAI_API_KEY and AGENT_MODEL in .env (see .env.example)."
         )
     names = list(SCENARIOS) if a.scenario == "all" else [a.scenario]
     with RUNS_FILE.open("a") as f:
         for name in names:
-            rec = run_agent(name, a.confusing_tools, a.max_steps, a.session)
+            rec = run_agent(name, a.confusing_tools, a.max_steps, a.session, a.mock)
             f.write(json.dumps(rec) + "\n")
             if a.answer:
                 _print_answer(rec)

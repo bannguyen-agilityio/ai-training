@@ -1,5 +1,4 @@
 import pytest
-from scripts import SCRIPTS
 
 from trajectory_lab import agent
 from trajectory_lab.analyze import steps_from_observations
@@ -16,6 +15,7 @@ from trajectory_lab.detectors import (
     no_info_steps,
     tool_selection,
 )
+from trajectory_lab.scripts import SCRIPTS
 
 ERR = {"error": "504"}
 OK = {"status": "ok"}

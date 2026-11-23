@@ -33,7 +33,9 @@ uv run traj-agent --scenario all     # 3. run the agent six times with a real LL
 uv run traj-analyze                  # 5. let code analyze the runs (optional, at the end)
 ```
 
-The agent is driven by a real LLM. Put any model behind an OpenAI-compatible endpoint (such as 9router) in `.env`: `OPENAI_BASE_URL`, `OPENAI_API_KEY`, `AGENT_MODEL`. Each scenario gives the model a task plus a small nudge that makes its failure likely, not certain.
+No LLM or API key handy? Add `--mock` (`uv run traj-agent --mock --scenario all`). A scripted planner replays the same six trajectories every time, so each trace shows its failure cleanly and you only need Langfuse keys. The scripts are in `src/trajectory_lab/scripts.py`; edit them to invent your own failures.
+
+Otherwise the agent is driven by a real LLM. Put any model behind an OpenAI-compatible endpoint (such as 9router) in `.env`: `OPENAI_BASE_URL`, `OPENAI_API_KEY`, `AGENT_MODEL`. Each scenario gives the model a task plus a small nudge that makes its failure likely, not certain.
 
 A real model varies from run to run, so **your trace may differ** from the example trees below, which show each failure cleanly. Look for the same pattern in your own trace. Stuck? Add `--answer` to `traj-agent` and it prints an answer key computed from your own run. That spoils the exercise, so use it after you have tried. If the failure did not happen, run the scenario again.
 
