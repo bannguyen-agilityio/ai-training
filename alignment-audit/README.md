@@ -53,6 +53,34 @@ The agent plan is scripted (the injection is simulated); only the auditor is a l
 
 In `trace.jsonl`, you will see only a few events: `start`, one `executed` per allowed step, then `halt` with the verdict.
 
+## In a real project
+
+This sample writes its own small auditor to show the idea. In production, use existing tools. Check each project's current docs, because these libraries change quickly.
+
+**Ready-made AlignmentCheck**
+- LlamaFirewall (Meta, `llamafirewall` package): includes AlignmentCheck, PromptGuard 2 for input scanning and CodeShield for generated code. AlignmentCheck is marked experimental.
+
+**Guardrail hooks in your agent framework**
+- OpenAI Agents SDK: input, output and tool guardrails that can stop a run. Put the AlignmentCheck call in a tool guardrail.
+- LangGraph and LangChain: a check node or middleware before the tool step, and interrupts for human approval.
+- Claude Agent SDK: a hook that runs before a tool call and can deny it.
+
+**Standalone guardrail libraries**
+- NVIDIA NeMo Guardrails: policy flows around an LLM app, including tool-call checks.
+- Guardrails AI: validators on inputs and outputs.
+- Invariant Labs guardrails: rules over agent traces and tool-call sequences, which suits goal-drift checks.
+
+**Models and managed services**
+- Llama Guard, Prompt Guard and Azure Prompt Shields. These mostly cover injection and content safety, not goal drift.
+
+**What you still do yourself**
+- Choose the auditor model: a strong one per step is safest, a smaller one costs less.
+- Give the auditor thoughts and actions only, never tool outputs.
+- Give the agent only the tools it needs, and require human approval for risky actions such as sending data out.
+- Keep the verdicts for audit. A tracing tool such as Langfuse can store them better than a JSONL file.
+
+A practical stack: your framework's guardrail hook, LlamaFirewall's AlignmentCheck as the check, and human approval on risky tools.
+
 ## Limits
 
 **1. It checks "is this what the user asked for?", not "is this a good thing to do?"**
