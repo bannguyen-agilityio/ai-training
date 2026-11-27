@@ -1,0 +1,14 @@
+[project]
+name = "ch04"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+    "langchain==1.0.3",
+    "langchain-openai==1.0.1",
+    "langchain-community==0.4.1",
+    "requests==2.32.5",
+    "beautifulsoup4",
+    "ddgs==9.5.5",
+    "primp==0.15.0",
+    "python-dotenv>=1.2.4",
+]

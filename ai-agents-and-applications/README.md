@@ -25,11 +25,20 @@ This creates `.venv/` and installs the dependencies of every chapter.
 uv run jupyter notebook ch01/01-langchain_examples.ipynb
 ```
 
+## Chapter guides
+
+| Chapter | Topic | How to run |
+|---------|-------|------------|
+| `ch01` | LangChain examples | Notebook |
+| `ch02` | Prompt examples | Notebook |
+| `ch03` | Summarization | Notebook |
+| `ch04` | Research summarization engine | Scripts, see [ch04/README.md](ch04/README.md) |
+
 ## Adding a new chapter
 
 ```bash
-uv init --bare ch02
-cd ch02
+uv init --bare ch05
+cd ch05
 uv add <package>   # e.g. uv add langchain==1.0.3
 ```
 
